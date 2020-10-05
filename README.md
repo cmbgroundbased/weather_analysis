@@ -69,3 +69,13 @@ You have to specify the working PATH with all the data in this way `./analyse_da
 │   │   └── ...
 ...
 ```
+# Output
+
+The program return a `fits` file with the CDFs for every weather parameters, for every month and for every hour of the day of that specific month.
+
+If you use the `-m` option, the program return the median seasonal maps of a specific weather parameter. The seasonal maps are in `png` format.
+
+
+
+
+
