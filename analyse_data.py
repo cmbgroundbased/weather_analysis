@@ -53,21 +53,18 @@ if __name__ == '__main__':
 
             distr = cumulative_distribution_merra2(args.site, args.path, file_list, args.out_file, args.num_pix)
 
-            for i in range(0, 24):
-                plt.plot(distr[i])
-            plt.show()
-
     if args.reanalysis == "era5":
-
+        
         try:
-            file_list = sorted(glob.glob(args.path+"*.nc"))
+            file_list = sorted(glob.glob(args.path+"m*"))
             print("Num of files:\t", len(file_list))
         except FileNotFoundError as FnF:
             print("Error Number {0}; {1}".format(FnF.errno, FnF.strerror))
 
         if args.seasonal_maps:
-            make_maps_era5(args.site, args.path, file_list, args.out_file, args.num_pix, args.variable)
 
+            make_maps_era5(args.site, args.path, file_list, args.out_file, args.num_pix, args.variable)
+            
         else:
 
-            cumulative_distribution_era5(args.site, args.path, file_list, args.out_file, args.num_pix, args.pix_size)
+            distr = cumulative_distribution_era5(args.site, args.path, file_list, args.out_file, args.num_pix)
