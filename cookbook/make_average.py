@@ -11,6 +11,8 @@ size = comm.Get_size()
 
 # All the threads must have the 
 
+N_years = 72 # Limited by the INDACO wall-time
+
 def bandshape(focal_plane, detectors, det):
     id_pol = focal_plane['horns'][det]['polarimeter_id']
     for i in detectors:
@@ -45,12 +47,12 @@ Q_detectors = ["B0", "B1", "B2", "B3", "B4", "B5", "B6",
 # The win array is shared between all the threads but all the results
 # have to be gathered in a single array allocated by the "rank == 0"
 if rank == 0:
-    nbytes = (49*24*12*27*120)*MPI.DOUBLE.Get_size()
+    nbytes = (49*24*12*27*N_years)*MPI.DOUBLE.Get_size()
     
-    print("Start to make average from 1900 to 2020...")
+    print("Start to make average from 1948 to 2020...")
     print("You have to free at least: "+str(nbytes/(1024*1024))+" MB" )
     print("Comunicator size: "+str(size))
-    print("Years per thread: "+str(int(120/size)))
+    print("Years per thread: "+str(int(N_years/size)))
 else:
     nbytes = 0
 
@@ -60,17 +62,17 @@ win = MPI.Win.Allocate_shared(nbytes, MPI.DOUBLE.Get_size(), comm=comm)
 buf, itemsize = win.Shared_query(0)
 
 # The array allocated by the rank = 0 is a numpy array.
-t_atm_40GHz_K = np.ndarray(buffer=buf, dtype='d', shape=(49, 12, 24, 27*120))
+t_atm_40GHz_K = np.ndarray(buffer=buf, dtype='d', shape=(49, 12, 24, 27*N_years))
 
 # The number of the years that every thread have to evaluate
 threads = size
-years_per_threads = int(120/size)
+years_per_threads = int(N_years/size)
 
 # A global index that rely on the rank number
 global_index = rank*years_per_threads*27
 
 
-for year in range(rank*years_per_threads+1901, (rank+1)*years_per_threads+1901):
+for year in range(rank*years_per_threads+1949, (rank+1)*years_per_threads+1949):
     
     print("Thread: "+str(rank)+" has taken in charge the year "+str(year))
     t1 = MPI.Wtime()
@@ -80,7 +82,7 @@ for year in range(rank*years_per_threads+1901, (rank+1)*years_per_threads+1901):
         for month in range(1, 13):
             
             for hour in range(0, 24):
-                t3 = MPI.Wtime()
+                #t3 = MPI.Wtime()
                 
                 primes = 0
                 seconds = 0
@@ -114,9 +116,9 @@ for year in range(rank*years_per_threads+1901, (rank+1)*years_per_threads+1901):
                     t_atm_40GHz_K[det_index, month-1, hour, global_index] += t_atm
                     det_index = det_index + 1
                 # print("Rank: "+str(rank)+" has just finished the whole focal_plane")
-                t4 = MPI.Wtime()
+                #t4 = MPI.Wtime()
                 #print("Rank "+str(rank)+" fnished hour "+str(hour)+" in "+str(t4-t3)+" sec.")
-                print("Days: "+str((t4-t3)*24*12*27*(120/size)/(3600*24)))
+                #print("Days: "+str((t4-t3)*24*12*27*(N_years/size)/(3600*24)))
 
         global_index = global_index + 1
 
