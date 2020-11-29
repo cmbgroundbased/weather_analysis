@@ -82,7 +82,11 @@ for year in range(rank*years_per_threads+1949, (rank+1)*years_per_threads+1949):
         for month in range(1, 13):
             
             for hour in range(0, 24):
+<<<<<<< HEAD
                 #t3 = MPI.Wtime()
+=======
+                # t3 = MPI.Wtime()
+>>>>>>> 7310970d33ad0397bbccbea5f481c67884dd783a
                 
                 primes = 0
                 seconds = 0
@@ -116,9 +120,15 @@ for year in range(rank*years_per_threads+1949, (rank+1)*years_per_threads+1949):
                     t_atm_40GHz_K[det_index, month-1, hour, global_index] += t_atm
                     det_index = det_index + 1
                 # print("Rank: "+str(rank)+" has just finished the whole focal_plane")
+<<<<<<< HEAD
                 #t4 = MPI.Wtime()
                 #print("Rank "+str(rank)+" fnished hour "+str(hour)+" in "+str(t4-t3)+" sec.")
                 #print("Days: "+str((t4-t3)*24*12*27*(N_years/size)/(3600*24)))
+=======
+                # t4 = MPI.Wtime()
+                # print("Rank "+str(rank)+" fnished hour "+str(hour)+" in "+str(t4-t3)+" sec.")
+                # print("Days: "+str((t4-t3)*24*12*27*(120/size)/(3600*24)))
+>>>>>>> 7310970d33ad0397bbccbea5f481c67884dd783a
 
         global_index = global_index + 1
 
