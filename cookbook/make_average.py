@@ -11,7 +11,8 @@ size = comm.Get_size()
 
 # All the threads must have the 
 
-N_years = 72 # Limited by the INDACO wall-time
+N_years = 120
+N_detectors = 7
 
 def bandshape(focal_plane, detectors, det):
     id_pol = focal_plane['horns'][det]['polarimeter_id']
@@ -35,19 +36,20 @@ with open(r'strip_focal_plane.yaml') as file:
     
 with open(r'strip_detectors.yaml') as file:
     detectors = yaml.full_load(file)
-    
-Q_detectors = ["B0", "B1", "B2", "B3", "B4", "B5", "B6",
-               "G0", "G1", "G2", "G3", "G4", "G5", "G6",
-               "I0", "I1", "I2", "I3", "I4", "I5", "I6",
-               "O0", "O1", "O2", "O3", "O4", "O5", "O6",
-               "R0", "R1", "R2", "R3", "R4", "R5", "R6",
-               "V0", "V1", "V2", "V3", "V4", "V5", "V6",
-               "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6"]
+ 
+Q_detectors = ["I0", "I1", "I2", "I3", "I4", "I5", "I6"]
+#Q_detectors = ["B0", "B1", "B2", "B3", "B4", "B5", "B6",
+#               "G0", "G1", "G2", "G3", "G4", "G5", "G6",
+#               "I0", "I1", "I2", "I3", "I4", "I5", "I6",
+#               "O0", "O1", "O2", "O3", "O4", "O5", "O6",
+#               "R0", "R1", "R2", "R3", "R4", "R5", "R6",
+#               "V0", "V1", "V2", "V3", "V4", "V5", "V6",
+#               "Y0", "Y1", "Y2", "Y3", "Y4", "Y5", "Y6"]
 
 # The win array is shared between all the threads but all the results
 # have to be gathered in a single array allocated by the "rank == 0"
 if rank == 0:
-    nbytes = (49*24*12*27*N_years)*MPI.DOUBLE.Get_size()
+    nbytes = (N_detectors*24*12*27*N_years)*MPI.DOUBLE.Get_size()
     
     print("Start to make average from 1948 to 2020...")
     print("You have to free at least: "+str(nbytes/(1024*1024))+" MB" )
@@ -62,7 +64,7 @@ win = MPI.Win.Allocate_shared(nbytes, MPI.DOUBLE.Get_size(), comm=comm)
 buf, itemsize = win.Shared_query(0)
 
 # The array allocated by the rank = 0 is a numpy array.
-t_atm_40GHz_K = np.ndarray(buffer=buf, dtype='d', shape=(49, 12, 24, 27*N_years))
+t_atm_40GHz_K = np.ndarray(buffer=buf, dtype='d', shape=(N_detectors, 12, 24, 27*N_years))
 
 # The number of the years that every thread have to evaluate
 threads = size
@@ -72,7 +74,7 @@ years_per_threads = int(N_years/size)
 global_index = rank*years_per_threads*27
 
 
-for year in range(rank*years_per_threads+1949, (rank+1)*years_per_threads+1949):
+for year in range(rank*years_per_threads+1901, (rank+1)*years_per_threads+1901):
     
     print("Thread: "+str(rank)+" has taken in charge the year "+str(year))
     t1 = MPI.Wtime()
@@ -131,4 +133,4 @@ if rank == 0:
     print("Gather and write the result on file...")
     print("Number of samples: "+"27")
     print("Global index: "+str(global_index))
-    np.save("t_atm_par_bandshapes", t_atm_40GHz_K)
+    np.save("t_atm_par_bandshapes_Imodule", t_atm_40GHz_K)
