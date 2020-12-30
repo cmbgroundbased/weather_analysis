@@ -90,8 +90,8 @@ def cumulative_distribution_era5(site, path, month_list, out_file, npix):
             to_app_u10m = pd.Series(tmp_u10m)
             to_app_v10m = pd.Series(tmp_v10m)
             
-            if len(to_app_tqv.values[to_app_tqv.values > 30.0]) != 0:
-                print("Day skipped for bad weather")
+            if len(to_app_tqv.values[to_app_tqv.values > 12.0]) != 0:
+                print("Day skipped for bad weather, TQV: {}", np.amax(to_app_tqv.values))
             else:
                 df_tqi = df_tqi.append(to_app_tqi, ignore_index=True)
                 df_tql = df_tql.append(to_app_tql, ignore_index=True)
